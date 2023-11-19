@@ -1,4 +1,9 @@
+import os
+from dotenv import load_dotenv
 import googlemaps
+
+# Carga las variables de entorno desde el archivo .env
+load_dotenv()
 
 def obtener_direcciones(api_key, origen, destino):
     gmaps = googlemaps.Client(key=api_key)
@@ -28,7 +33,11 @@ def calcular_consumo_ajustado(ruta_info):
 
     return consumo_ajustado
 
-def encontrar_ruta_optima(api_key, origen, destino): 
+def encontrar_ruta_optima():
+    api_key = os.getenv('GOOGLE_MAPS_API_KEY')
+    origen = 'Universidad Eafit'
+    destino = 'MetroCable Santo Domingo'
+
     direcciones = obtener_direcciones(api_key, origen, destino)
 
     if not direcciones:
@@ -68,8 +77,5 @@ def encontrar_ruta_optima(api_key, origen, destino):
         print(f"\nLa ruta más eficiente es la Ruta {mejor_ruta} con un consumo ajustado de {mejor_consumo_ajustado:.2f} kWh.")
 
 # Ejemplo de uso
-api_key = 'AIzaSyAK6vxH-VLqIVwskID_NGIasy_48zBVYf0'
-origen = 'Universidad Eafit'
-destino = 'MetroCable Santo Domingo'
+encontrar_ruta_optima()
 
-encontrar_ruta_optima(api_key, origen, destino)
