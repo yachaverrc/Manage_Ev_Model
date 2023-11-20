@@ -45,7 +45,7 @@ def encontrar_ruta_optima():
         return
 
     porcentaje_bateria_actual = float(input("Ingrese el porcentaje de batería actual: "))
-    porcentaje_bateria_total = 100  # Puedes ajustar esto según la capacidad total de tu batería
+    capacidad_bateria_estandar = 60  # Capacidad estándar de la batería en kWh
 
     mejor_consumo_ajustado = float('inf')
     mejor_ruta = None
@@ -53,28 +53,34 @@ def encontrar_ruta_optima():
     for i, ruta_info in enumerate(direcciones):
         consumo_ajustado = calcular_consumo_ajustado(ruta_info)
 
-        porcentaje_bateria_necesario = max(0, (consumo_ajustado / porcentaje_bateria_total) * 100)
+        porcentaje_bateria_necesario = max(0, (consumo_ajustado / capacidad_bateria_estandar) * 100)
 
         print(f"\nValores para la Ruta {i + 1}:")
         print(f"Distancia: {ruta_info['legs'][0]['distance']['text']}")
         print(f"Duración: {ruta_info['legs'][0]['duration']['text']}")
         print(f"Consumo ajustado: {consumo_ajustado:.2f} kWh")
-        print(f"Porcentaje de batería necesario: {porcentaje_bateria_necesario:.2f}%")
 
-        if porcentaje_bateria_actual >= porcentaje_bateria_necesario:
+        if porcentaje_bateria_necesario <= 0:
+            print(f"Porcentaje de batería necesario: 0.00%")
             print(f"Con el porcentaje de batería actual, puedes llegar al destino.")
             print(f"Gastarías aproximadamente {consumo_ajustado:.2f} kWh de energía.")
         else:
-            print("El porcentaje de batería actual no permite llegar al destino.")
+            print(f"Porcentaje de batería necesario: {porcentaje_bateria_necesario:.2f}%")
+            if porcentaje_bateria_necesario > porcentaje_bateria_actual:
+                diferencia_porcentaje = porcentaje_bateria_necesario - porcentaje_bateria_actual
+                print(f"Necesitas cargar aproximadamente {diferencia_porcentaje:.2f}% más de batería.")
 
-            # Aquí podrías agregar alguna lógica adicional si es necesario, como sugerir recargar la batería.
-
+        # Ajuste: Comparar consumo ajustado para determinar la ruta más eficiente
         if consumo_ajustado < mejor_consumo_ajustado:
             mejor_consumo_ajustado = consumo_ajustado
             mejor_ruta = i + 1
 
-    if mejor_ruta is not None:
+    if mejor_ruta is not None and porcentaje_bateria_necesario > porcentaje_bateria_actual:
         print(f"\nLa ruta más eficiente es la Ruta {mejor_ruta} con un consumo ajustado de {mejor_consumo_ajustado:.2f} kWh.")
+        print(f"Debes recargar aproximadamente {porcentaje_bateria_necesario:.2f}% de batería para usar la ruta más eficiente.")
+    elif mejor_ruta is None:
+        print("\nNinguna ruta te permite llegar al destino con el porcentaje actual de batería.")
+        print(f"Debes recargar aproximadamente {porcentaje_bateria_necesario:.2f}% de batería para usar la ruta más eficiente.")
 
 # Ejemplo de uso
 encontrar_ruta_optima()
